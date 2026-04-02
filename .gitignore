@@ -1,0 +1,91 @@
+# ============================================================
+# FPGA-Litho Git Ignore Configuration
+# ============================================================
+
+# Build output directories
+build/
+export/
+*.bin/
+*.pdi/
+
+# Vitis HLS generated directories
+hls_top_simple/
+*_hls/
+*.hlsrun/
+*.syn/
+*.imp/
+*.cosim/
+
+# Object files and dependent files
+*.o
+*.d
+*.obj
+*.elf
+*.a
+*.lib
+
+# Log files and directories
+logs/
+*.log
+*.jou
+
+# Lock files and temporary files
+*.lock
+*.tmp
+*.bak
+*~
+
+# Vitis workspace files
+.vitisWorkspace.json
+*.wsdata/
+workspace_journal*.py
+
+# IDE configuration (keep user-specific settings)
+_ide/logs/
+_ide/.wsdata/
+_ide/workspace_journal*
+
+# Vitis compilation files
+vitis-comp.json
+compile_commands.json
+config.cmdline
+run_sim.tcl
+sim.bat
+csim.mk
+Makefile.rules
+env.json
+
+# Testbench build outputs
+csim/build/
+csim/report/
+csim/obj/
+hls/csim/
+hls/report/
+
+# Summary files
+*.hlsrun_csim_summary
+*.summary
+
+# Data files (large datasets should not be committed)
+data/
+
+# ============================================================
+# Common ignores
+# ============================================================
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+.vscode/
+.idea/
+
+
