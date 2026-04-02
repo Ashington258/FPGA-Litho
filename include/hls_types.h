@@ -73,15 +73,117 @@ typedef std::complex<fft_data_out_t> cmpxFixedOut;
 typedef fft_data_in_t fft_data_t;
 typedef cmpxFixedIn cmpxFixed;
 
-// FFT配置结构体 (scaled模式)
-struct fft_config_t : hls::ip_fft::params_t {
+// ============================================================
+// FFT配置结构体 (与官方interface_stream完全一致)
+// ============================================================
+
+// 配置结构体 - 命名为config1与官方保持一致
+struct config1 : hls::ip_fft::params_t {
     static const unsigned input_width = FFT_INPUT_WIDTH;
     static const unsigned output_width = FFT_OUTPUT_WIDTH;
+    static const unsigned fft_length = FFT_LENGTH;
+    static const unsigned nfft_max = FFT_NFFT_MAX;
+    static const unsigned num_channels = FFT_CHANNELS;
+    
+    static const unsigned arch = hls::ip_fft::pipelined_streaming_io;
     static const unsigned output_ordering = hls::ip_fft::natural_order;
+    static const unsigned scaling_mode = hls::ip_fft::scaled;
+    static const unsigned rounding_mode = hls::ip_fft::truncation;
 };
 
-typedef hls::ip_fft::config_t<fft_config_t> config_t;
-typedef hls::ip_fft::status_t<fft_config_t> status_t;
+// 配置和状态类型定义
+typedef hls::ip_fft::config_t<config1> config_t;
+typedef hls::ip_fft::status_t<config1> status_t;
+
+// 保持原有fft_config_t兼容性（deprecated，建议使用config1）
+typedef config1 fft_config_t;
+
+// ============================================================
+// FFT缩放策略 (scaled模式)
+// ============================================================
+
+// 固定缩放策略：每级缩放1bit
+// 0x1555 = 01 01 01 01 01... (每2位控制一级)
+// 10级各缩放1bit → 总缩放 = 2^10 = 1024倍
+// scaled模式下，FFT和IFFT使用相同缩放，幅度自动恢复
+const ap_uint<15> SCALING_FFT  = 0x1555;  // FFT正向缩放
+const ap_uint<15> SCALING_IFFT = 0x1555;  // IFFT逆向缩放
+
+// 无缩放策略（用于精度测试，可能溢出）
+const ap_uint<15> SCALING_NONE = 0x0000;
+
+// ============================================================
+// 动态缩放调度计算函数
+// ============================================================
+
+/**
+ * @brief 根据输入数据幅度计算FFT缩放调度
+ * 
+ * scaled模式下，scaling_schedule每2位控制一级FFT缩放:
+ * - 00 = 无缩放
+ * - 01 = 缩放1bit (推荐)
+ * - 10 = 缩放2bit
+ * - 11 = 不缩放
+ * 
+ * @param input_max   输入数据最大幅度 (绝对值)
+ * @param fft_stages  FFT级数 (log2(FFT_LENGTH), 如1024点=10级)
+ * @return ap_uint<15> 缩放调度值
+ * 
+ * 计算逻辑:
+ * - ap_fixed<16,1> 范围约 [-2, 2)，整数部分1位
+ * - FFT频域峰值 ≈ N × 输入幅度 (N=FFT点数)
+ * - 需要足够的缩放防止频域峰值溢出
+ * - 每级缩放1bit可将峰值降低2倍
+ * 
+ * 示例:
+ * - input_max=0.5, fft_stages=10 → 返回 0x1555 (每级缩放1bit)
+ * - input_max=0.1, fft_stages=10 → 返回 0x0555 (偶数级缩放)
+ * - input_max<0.01 → 返回 SCALING_NONE (无需缩放)
+ */
+inline ap_uint<15> compute_scaling_schedule(float input_max, int fft_stages) {
+    // 安全阈值计算
+    // ap_fixed<16,1> 整数部分1位，可表示 ±1.999...
+    // FFT频域峰值 = N × input_max，需保证峰值 < 1.0
+    
+    float fft_length = (float)(1 << fft_stages);  // N = 2^stages
+    float expected_peak = fft_length * input_max; // 预期频域峰值
+    
+    // 目标: 将峰值缩放到安全范围 (< 0.5 以留有余量)
+    float target_peak = 0.5f;
+    float required_scale = expected_peak / target_peak;
+    
+    // 计算需要的总缩放bits
+    int total_scale_bits = 0;
+    if (required_scale > 1.0f) {
+        total_scale_bits = (int)ceil(log2(required_scale));
+    }
+    
+    // 限制最大缩放 (不超过fft_stages)
+    total_scale_bits = (total_scale_bits > fft_stages) ? fft_stages : total_scale_bits;
+    
+    // 构建scaling_schedule
+    // 每级分配缩放，优先前级（蝶形运算从前向后）
+    ap_uint<15> schedule = 0;
+    int scale_per_stage = (total_scale_bits > 0) ? 
+                          (total_scale_bits / fft_stages) + 1 : 0;
+    
+    // 每级最多缩放1bit (01), 防止精度损失过大
+    // 使用ap_uint类型避免位宽不匹配警告
+    for (int stage = 0; stage < fft_stages && stage < 7; stage++) {
+        if (stage < total_scale_bits) {
+            // 设置该级缩放1bit: 01
+            // 使用ap_uint<15>类型避免位运算警告
+            schedule |= (ap_uint<15>(0x01) << (stage * 2));
+        }
+    }
+    
+    // 如果计算结果为0但输入幅度较大，使用保守策略
+    if (schedule == 0 && input_max > 0.1f) {
+        schedule = SCALING_FFT;  // 使用默认保守缩放
+    }
+    
+    return schedule;
+}
 
 // ============================================================
 // Litho参数常量
@@ -122,6 +224,33 @@ const int MAX_KERNELS      = 16;       // 最大SOCS核数量
 // 计算归一化因子
 inline float normalize_factor(int sizeX, int sizeY) {
     return 1.0f / (sizeX * sizeY);
+}
+
+// ============================================================
+// 浮点-定点转换函数 (用于外部接口与内部FFT交互)
+// ============================================================
+
+// 浮点转定点 (输入接口)
+// 将浮点复数转换为FFT IP所需的定点复数
+inline cmpxFixed float_to_fixed(cmpxFloat f) {
+    return cmpxFixed(fft_data_t(f.real()), fft_data_t(f.imag()));
+}
+
+// 定点转浮点 (输出接口)
+// 将FFT IP输出的定点复数转换为浮点
+inline cmpxFloat fixed_to_float(cmpxFixedOut f) {
+    return cmpxFloat(f.real().to_float(), f.imag().to_float());
+}
+
+// 浮点实数转定点复数 (R2C输入)
+// 实数作为复数的实部，虚部置0
+inline cmpxFixed real_to_fixed(realFloat r) {
+    return cmpxFixed(fft_data_t(r), fft_data_t(0));
+}
+
+// 定点复数取实部转浮点 (C2R输出)
+inline realFloat fixed_real_to_float(cmpxFixedOut c) {
+    return c.real().to_float();
 }
 
 // 计算循环移位索引

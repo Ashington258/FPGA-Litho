@@ -2,35 +2,37 @@
  * K-Litho HLS Simplified FFT Module
  * 简化版FFT模块 - 使用定点数 (hls::fft原生支持)
  * 
- * 重要修复：使用定点数而非浮点数，参考interface_stream实现
- * FFT IP核原生支持定点数 (ap_fixed)，浮点支持有限
+ * 重要修复：参考Vitis官方 interface_stream 实现
+ * - 使用 config1 配置结构体
+ * - 固定缩放策略 SCALING_FFT = 0x1555
+ * - FFT IP核原生支持定点数 (ap_fixed)
  */
 
 #include "../include/hls_types.h"
 #include <hls_stream.h>
 
 // ============================================================
-// FFT IP核封装 (使用定点数 + scaled缩放模式)
-// scaled模式: scaling_schedule参数控制每级缩放
-// scaling_schedule=0: 无缩放 (可能溢出，但用于测试精度)
+// FFT核心函数 (与官方interface_stream完全一致)
+// 使用定点数 + scaled缩放模式
 // ============================================================
 
-void fft_ip_core(
+void fft_top(
     ap_uint<1> dir,
-    ap_uint<15> scaling_schedule,  // 缩放调度参数 (scaled模式)
-    hls::stream<cmpxFixed> &xn,
-    hls::stream<cmpxFixed> &xk,
+    ap_uint<15> scaling,
+    hls::stream<cmpxFixedIn> &xn,
+    hls::stream<cmpxFixedOut> &xk,
     bool* status
 ) {
 #pragma HLS interface ap_fifo depth=1 port=status
 #pragma HLS interface ap_fifo depth=1024 port=xn,xk
 #pragma HLS stream variable=xn
 #pragma HLS stream variable=xk
+#pragma HLS dataflow
 
-    // scaled模式调用FFT IP核
-    // scaling_schedule: 每两位控制一级FFT的缩放 (0=无缩放, 1=缩放1bit, 2=缩放2bit, 3=不缩放)
-    // nfft=-1: 使用默认FFT_NFFT_MAX (10, 即1024点)
-    hls::fft<fft_config_t>(xn, xk, dir, scaling_schedule, -1, status);
+    // 使用 config1 配置结构体调用 FFT IP核
+    // scaling: 每两位控制一级FFT缩放
+    // nfft=-1: 使用默认 FFT_NFFT_MAX (10, 即1024点)
+    hls::fft<config1>(xn, xk, dir, scaling, -1, status);
 }
 
 // ============================================================
@@ -68,21 +70,21 @@ void hls_top_simple(
         fft_in.write(cmpxFixed(fft_data_t(val), fft_data_t(0)));
     }
 
-    // Stage 2: 正向FFT (scaled模式, 无缩放测试)
+    // Stage 2: 正向FFT (scaled模式, 固定缩放策略)
     bool status_fft;
-    fft_ip_core(0, 0, fft_in, fft_out, &status_fft);  // scaling_schedule=0
+    fft_top(0, SCALING_FFT, fft_in, fft_out, &status_fft);
 
-    // Stage 3: 逆向IFFT (scaled模式, 无缩放测试)
+    // Stage 3: 逆向IFFT (scaled模式, 固定缩放策略)
     bool status_ifft;
-    fft_ip_core(1, 0, fft_out, ifft_out, &status_ifft);  // scaling_schedule=0
+    fft_top(1, SCALING_IFFT, fft_out, ifft_out, &status_ifft);
 
-    // Stage 4: 定点转浮点并正确缩放
-    // scaled模式无缩放时: FFT->IFFT输出 = 输入 × N
-    // 需要除以N恢复正确幅度
-    float scale = 1.0f / (float)total_size;
+    // Stage 4: 定点转浮点输出
+    // scaled模式: FFT每级缩放1bit (总缩放1024), IFFT每级缩放1bit (总缩放1024)
+    // FFT->IFFT: 幅度自动恢复 (1024 × 1024 = 完整恢复)
+    // 注意: 使用固定缩放策略时，输出幅度与输入一致，无需额外归一化
     for (int i = 0; i < total_size; i++) {
 #pragma HLS LOOP_TRIPCOUNT min=1024 max=1024 avg=1024
-        cmpxFixed val = ifft_out.read();
-        data_out.write((float)val.real() * scale);
+        cmpxFixedOut val = ifft_out.read();
+        data_out.write(val.real().to_float());
     }
 }

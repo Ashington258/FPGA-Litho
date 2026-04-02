@@ -1,53 +1,60 @@
 /*
  * K-Litho HLS FFT R2C Header
  * FFT实数到复数变换头文件
+ * 
+ * 重构版本：移除手动频域重组函数声明
  */
 
 #ifndef HLS_FFT_R2C_H
 #define HLS_FFT_R2C_H
 
+#include "../include/hls_types.h"
 #include <hls_stream.h>
-#include <ap_fixed.h>
-#include <complex>
 
-// 类型定义 (从 hls_types.h 引入)
-typedef float realFloat;
-typedef std::complex<float> cmpxFloat;
+// ============================================================
+// 辅助函数声明
+// ============================================================
 
 /**
- * @brief FFT R2C 核心变换
+ * @brief 实数浮点转定点复数 (虚部置0)
  */
-void hls_fft_r2c_core(
-    ap_uint<1> direction,
-    ap_uint<15> length,
-    hls::stream<cmpxFloat> &xn_in,
-    hls::stream<cmpxFloat> &xk_out,
-    bool *ovflo
+void real_to_complex_fixed(
+    hls::stream<realFloat> &real_in,
+    hls::stream<cmpxFixedIn> &cmplx_out,
+    int size
 );
 
 /**
- * @brief 实数转复数流
+ * @brief 定点复数转浮点复数
  */
-void real_to_complex(
+void fixed_to_complex_float(
+    hls::stream<cmpxFixedOut> &cmplx_in,
+    hls::stream<cmpxFloat> &cmplx_out,
+    int size
+);
+
+// ============================================================
+// 顶层函数声明
+// ============================================================
+
+/**
+ * @brief FFT R2C 完整流程 (简化版)
+ * 
+ * 流程:
+ * 1. 实数浮点 -> 定点复数 (虚部置0)
+ * 2. FFT核心处理 (natural_order输出)
+ * 3. 定点复数 -> 浮点复数
+ * 
+ * 注意: 已移除手动频域重组，依赖FFT IP的natural_order
+ */
+void hls_fft_r2c(
     hls::stream<realFloat> &real_in,
     hls::stream<cmpxFloat> &cmplx_out,
-    int total_size
-);
-
-/**
- * @brief FFT输出重排序
- */
-void fft_output_reorder(
-    hls::stream<cmpxFloat> &fft_out,
-    hls::stream<cmpxFloat> &reordered_out,
     int sizeX,
     int sizeY
 );
 
-/**
- * @brief FFT R2C 完整流程
- */
-void hls_fft_r2c(
+#endif // HLS_FFT_R2C_H
     hls::stream<realFloat> &data_in,
     hls::stream<cmpxFloat> &data_out,
     int sizeX,

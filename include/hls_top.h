@@ -1,6 +1,12 @@
 /*
  * K-Litho HLS Top Module Header
  * 光刻模拟顶层集成模块头文件
+ * 
+ * 时钟约束: 5ns (200MHz)
+ * - calcImage: II=4 @ 200MHz (Fmax: 273MHz verified)
+ * 
+ * @author K-Litho Team
+ * @date 2026-04-02 (Updated for 200MHz integration)
  */
 
 #ifndef HLS_TOP_H
@@ -8,6 +14,7 @@
 
 #include <hls_stream.h>
 #include <complex>
+#include "hls_calc_image_integrated.h"
 
 // 类型定义 (从 hls_types.h 引入)
 typedef float realFloat;
@@ -44,7 +51,7 @@ void complex_mac_accumulate(
 );
 
 /**
- * @brief 简化版光学图像频域计算
+ * @brief 简化版光学图像频域计算 (AXI-Stream版本)
  */
 void calc_image_simple(
     hls::stream<cmpxFloat> &mask_fft,
@@ -52,6 +59,20 @@ void calc_image_simple(
     hls::stream<cmpxFloat> &imgf_out,
     int sizeX,
     int sizeY
+);
+
+/**
+ * @brief calcImage集成版本 (AXI-Master接口)
+ * 使用验证的200MHz calcImage kernel
+ */
+void calc_image_integrated_wrapper(
+    cmpxFloat msk[CI_MAX_LX * CI_MAX_LY],
+    cmpxFloat tcc[CI_TCC_TOTAL],
+    cmpxFloat imgf[CI_MAX_LX * CI_MAX_LY],
+    int Lx,
+    int Ly,
+    int Nx,
+    int Ny
 );
 
 /**
