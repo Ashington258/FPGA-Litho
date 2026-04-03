@@ -99,10 +99,10 @@ bool test_single_data_load_read() {
     // 测试tcc数据加载/读取
     cout << "Testing tcc_bram..." << endl;
     test_val = cmpxFloat(5.5f, 6.5f);
-    load_tcc_data(100, test_val);
-    read_val = tcc_bram[100];
+    load_tcc_data(20, test_val);  // 使用有效索引 (< 49)
+    read_val = tcc_bram[20];
     if (!compare_complex(read_val, test_val)) {
-        cout << "  ERROR: tcc_bram[100] mismatch" << endl;
+        cout << "  ERROR: tcc_bram[20] mismatch" << endl;
         all_passed = false;
     }
     

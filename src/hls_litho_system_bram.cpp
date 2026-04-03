@@ -34,18 +34,6 @@ float img_out_bram[BRAM_IMG_OUT_SIZE];
 volatile int compute_status = 0;  // 0=idle, 1=running, 2=done, 3=error
 
 //=============================================================================
-// BRAM Storage Binding Pragmas
-//=============================================================================
-
-// 强制绑定到BRAM实现 (非URAM)
-#pragma HLS BIND_STORAGE variable=source_bram type=RAM_2P impl=BRAM
-#pragma HLS BIND_STORAGE variable=mask_bram type=RAM_2P impl=BRAM
-#pragma HLS BIND_STORAGE variable=tcc_bram type=RAM_2P impl=BRAM
-#pragma HLS BIND_STORAGE variable=kernels_bram type=RAM_2P impl=BRAM
-#pragma HLS BIND_STORAGE variable=imgf_bram type=RAM_2P impl=BRAM
-#pragma HLS BIND_STORAGE variable=img_out_bram type=RAM_2P impl=BRAM
-
-//=============================================================================
 // Data Loading Functions Implementation
 //=============================================================================
 
@@ -227,8 +215,13 @@ void start_litho_compute(
         params_valid = false;
     }
     
-    // 光源尺寸检查
-    if (srcSize < 1 || srcSize > BRAM_MAX_SRC_SIZE) {
+    // 光源尺寸检查 (仅TCC模式需要)
+    if (mode == 1 && (srcSize < 1 || srcSize > BRAM_MAX_SRC_SIZE)) {
+        params_valid = false;
+    }
+    
+    // SOCS模式下srcSize可以为0 (不需要光源数据)
+    if (mode == 2 && srcSize < 0) {
         params_valid = false;
     }
     
@@ -478,6 +471,14 @@ void hls_litho_system_bram(
 #pragma HLS INTERFACE s_axilite port=srcSize bundle=control
 #pragma HLS INTERFACE s_axilite port=nkernels bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control
+
+    // BRAM存储绑定 (强制使用BRAM实现，避免使用URAM)
+#pragma HLS BIND_STORAGE variable=source_bram type=RAM_2P impl=BRAM
+#pragma HLS BIND_STORAGE variable=mask_bram type=RAM_2P impl=BRAM
+#pragma HLS BIND_STORAGE variable=tcc_bram type=RAM_2P impl=BRAM
+#pragma HLS BIND_STORAGE variable=kernels_bram type=RAM_2P impl=BRAM
+#pragma HLS BIND_STORAGE variable=imgf_bram type=RAM_2P impl=BRAM
+#pragma HLS BIND_STORAGE variable=img_out_bram type=RAM_2P impl=BRAM
     
     // 调用计算控制函数
     start_litho_compute(mode, Lx, Ly, Nx, Ny, srcSize, nkernels);
