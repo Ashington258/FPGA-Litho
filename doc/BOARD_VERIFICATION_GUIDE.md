@@ -48,12 +48,12 @@
 
 本项目针对以下器件开发：
 
-| 项目         | 规格                         |
-| ------------ | ---------------------------- |
-| 目标器件     | xcku3p-ffvb676-2-e           |
-| FPGA系列     | Kintex UltraScale+           |
-| BRAM总量     | 720 (当前使用85%)            |
-| DSP总量      | 1368 (当前使用6%)            |
+| 项目     | 规格               |
+| -------- | ------------------ |
+| 目标器件 | xcku3p-ffvb676-2-e |
+| FPGA系列 | Kintex UltraScale+ |
+| BRAM总量 | 720 (当前使用85%)  |
+| DSP总量  | 1368 (当前使用6%)  |
 
 **推荐开发板**:
 - Xilinx KCU105 (Kintex UltraScale+ Evaluation Platform)
@@ -61,12 +61,12 @@
 
 ### 2.2 主机系统
 
-| 项目     | 要求                           |
-| -------- | ------------------------------ |
+| 项目     | 要求                            |
+| -------- | ------------------------------- |
 | 操作系统 | Linux (Ubuntu 20.04+) / Windows |
-| XRT版本  | 2025.2 或匹配Vitis版本         |
-| PCIe     | Gen3 x8 或更高                 |
-| 内存     | 16GB+ DDR4                     |
+| XRT版本  | 2025.2 或匹配Vitis版本          |
+| PCIe     | Gen3 x8 或更高                  |
+| 内存     | 16GB+ DDR4                      |
 
 ### 2.3 软件环境
 
@@ -118,16 +118,16 @@ report_ip_status [get_ips hls_litho_system_0]
 
 HLS IP接口说明:
 
-| 接口名        | 类型      | 功能             | 连接目标       |
-| ------------- | --------- | ---------------- | -------------- |
-| s_axi_control | AXI-Lite  | 控制/配置        | PS/PCIe CPU    |
-| m0            | AXI-Master| source数据       | DDR/BRAM       |
-| m1            | AXI-Master| mask数据         | DDR/BRAM       |
-| m2            | AXI-Master| kernels数据      | DDR/BRAM       |
-| m3            | AXI-Master| scales数据       | DDR/BRAM       |
-| m4            | AXI-Master| tcc输出          | DDR/BRAM       |
-| m5            | AXI-Master| imgf输出         | DDR/BRAM       |
-| m6            | AXI-Master| img_out输出      | DDR/BRAM       |
+| 接口名        | 类型       | 功能        | 连接目标    |
+| ------------- | ---------- | ----------- | ----------- |
+| s_axi_control | AXI-Lite   | 控制/配置   | PS/PCIe CPU |
+| m0            | AXI-Master | source数据  | DDR/BRAM    |
+| m1            | AXI-Master | mask数据    | DDR/BRAM    |
+| m2            | AXI-Master | kernels数据 | DDR/BRAM    |
+| m3            | AXI-Master | scales数据  | DDR/BRAM    |
+| m4            | AXI-Master | tcc输出     | DDR/BRAM    |
+| m5            | AXI-Master | imgf输出    | DDR/BRAM    |
+| m6            | AXI-Master | img_out输出 | DDR/BRAM    |
 
 ```tcl
 # 连接AXI接口示例
@@ -236,12 +236,12 @@ vivado -mode tcl -source script/vivado_build.tcl
 
 ### 4.3 预估时间
 
-| 步骤     | 预估时间 |
-| -------- | -------- |
-| 综合     | 15-30分钟 |
-| 实现     | 30-60分钟 |
-| 比特流   | 5-10分钟 |
-| 总计     | ~1小时 |
+| 步骤   | 预估时间  |
+| ------ | --------- |
+| 综合   | 15-30分钟 |
+| 实现   | 30-60分钟 |
+| 比特流 | 5-10分钟  |
+| 总计   | ~1小时    |
 
 ---
 
@@ -492,19 +492,19 @@ xbutil examine --device 0 --report memory
 
 板级验证完成标准:
 
-| 检查项                           | 状态 |
-| -------------------------------- | ---- |
-| Vivado项目创建成功               | [ ]  |
-| HLS IP导入成功                   | [ ]  |
-| Block Design连接正确             | [ ]  |
-| 综合通过 (无错误)                | [ ]  |
-| 实现通过 (时序满足)              | [ ]  |
-| 比特流生成成功                   | [ ]  |
-| FPGA设备检测成功                 | [ ]  |
-| 比特流加载成功                   | [ ]  |
-| 内核功能验证 (输出正确)          | [ ]  |
-| 性能基准测试完成                 | [ ]  |
-| 加速比计算完成                   | [ ]  |
+| 检查项                  | 状态 |
+| ----------------------- | ---- |
+| Vivado项目创建成功      | [ ]  |
+| HLS IP导入成功          | [ ]  |
+| Block Design连接正确    | [ ]  |
+| 综合通过 (无错误)       | [ ]  |
+| 实现通过 (时序满足)     | [ ]  |
+| 比特流生成成功          | [ ]  |
+| FPGA设备检测成功        | [ ]  |
+| 比特流加载成功          | [ ]  |
+| 内核功能验证 (输出正确) | [ ]  |
+| 性能基准测试完成        | [ ]  |
+| 加速比计算完成          | [ ]  |
 
 ---
 
