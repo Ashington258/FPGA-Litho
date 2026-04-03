@@ -721,83 +721,83 @@
   
   **设计文档**: `doc/STORAGE_SOLUTION_COMPARISON.md`
 
-#### BRAM接口实现
+#### BRAM接口实现 (Phase 6A: HLS代码实现)
 
-- [x] **TODO-6.3**: BRAM接口头文件实现 ✓ (已完成 2026-04-03)
-  **实现文件**: `include/hls_litho_system_bram.h`
+- [x] **TODO-6.A.1**: BRAM接口头文件实现 ✓ (已完成 2026-04-03)
+  **实现文件**: `include/hls_litho_system_bram.h` (273行)
   
   **核心定义**:
   ```cpp
-  // BRAM存储数组声明
-  cmpxFloat source_bram[L_SOURCE*L_SOURCE];
-  cmpxFloat mask_bram[L_MASK*L_MASK];
-  cmpxFloat tcc_bram[(2*Nx_MAX+1)*(2*Ny_MAX+1)*(2*Nx_MAX+1)*(2*Ny_MAX+1)];
-  cmpxFloat kernels_bram[nkernels_MAX*L_KERNEL*L_KERNEL];
-  float scales_bram[nkernels_MAX];
+  // BRAM存储常量定义
+  const int BRAM_SOURCE_SIZE = 4096;  // 光源最大尺寸
+  const int BRAM_MASK_SIZE = 4096;    // 掩模最大尺寸
+  const int BRAM_TCC_SIZE = 225;      // TCC矩阵 (Nx=3, 15×15)
+  const int BRAM_KERNELS_SIZE = 1800; // SOCS核 (8核×225)
+  const int BRAM_IMGF_SIZE = 4096;    // 频域输出
+  const int BRAM_IMG_OUT_SIZE = 841;  // 空域输出
   
-  // HLS存储绑定
-  #pragma HLS BIND_STORAGE variable=source_bram type=RAM_2P_URAM impl=BRAM
-  #pragma HLS BIND_STORAGE variable=mask_bram type=RAM_2P_URAM impl=BRAM
+  // 参数约束
+  const int BRAM_MAX_LX = 64;
+  const int BRAM_MAX_LY = 64;
+  const int BRAM_MAX_NX_TCC = 3;  // TCC模式Nx限制
+  const int BRAM_MAX_KERNELS = 8; // SOCS模式核数限制
   ```
-  
-  **函数接口**:
-  - `load_source_data(int idx, cmpxFloat val)` - 光源数据加载
-  - `load_mask_data(int idx, cmpxFloat val)` - 掩模数据加载
-  - `load_tcc_data(int idx, cmpxFloat val)` - TCC数据加载
-  - `load_kernels_data(int idx, cmpxFloat val)` - SOCS核加载
-  - `load_scales_data(int idx, float val)` - SOCS权重加载
-  - `read_imgf_data(int idx)` - 频域图像读取
-  - `read_img_out_data(int idx)` - 空间图像读取
-  - `start_litho_compute(...)` - 启动计算
-  - `get_compute_status()` - 获取状态
-  - `reset_bram_storage()` - 重置BRAM
 
-- [x] **TODO-6.4**: BRAM接口实现文件 ✓ (已完成 2026-04-03)
-  **实现文件**: `src/hls_litho_system_bram.cpp`
+- [x] **TODO-6.A.2**: BRAM接口实现文件 ✓ (已完成 2026-04-03)
+  **实现文件**: `src/hls_litho_system_bram.cpp` (453行)
   
-  **核心实现**:
+  **核心特性**:
+  - ✓ BRAM数组定义 + BIND_STORAGE pragma强制BRAM实现
+  - ✓ 数据加载函数: 逐字加载 + 批量加载两种接口
+  - ✓ 计算控制函数: 参数验证 + 状态管理
+  - ✓ TCC模式简化实现 (预计算TCC + 频域输出)
+  - ✓ SOCS模式简化实现 (核累加 + 平方幅度)
+  - ✓ PIPELINE II=1优化所有循环
+  
+  **关键代码片段**:
   ```cpp
-  // 数据加载函数 (AXI-Lite接口)
-  void load_source_data(int idx, cmpxFloat val) {
-      #pragma HLS INLINE
-      #pragma HLS PIPELINE II=1
-      if (idx >= 0 && idx < L_SOURCE*L_SOURCE) {
-          source_bram[idx] = val;
-      }
-  }
+  // BRAM强制绑定 (非URAM)
+  #pragma HLS BIND_STORAGE variable=source_bram type=RAM_2P impl=BRAM
   
-  // 计算控制函数
-  void start_litho_compute(int mode, int Lx, int Ly, int Nx, int Ny, int imgf_size, int nkernels) {
-      // 参数验证
-      if (Lx > L_SOURCE || Ly > L_MASK || Nx > Nx_MAX) {
-          compute_status = 3;  // 错误状态
-          return;
+  // 批量加载优化
+  void load_source_batch(cmpxFloat data[BRAM_SOURCE_SIZE]) {
+      for (int i = 0; i < BRAM_SOURCE_SIZE; i++) {
+          #pragma HLS PIPELINE II=1
+          source_bram[i] = data[i];
       }
-      
-      // 根据模式调用计算模块
-      if (mode == 1) {  // TCC模式
-          hls_litho_tcc_mode(source_bram, mask_bram, tcc_bram, imgf_bram, ...);
-      } else if (mode == 2) {  // SOCS模式
-          hls_litho_socs_mode(mask_bram, kernels_bram, scales_bram, img_out_bram, ...);
-      }
-      
-      compute_status = 2;  // 完成状态
   }
   ```
 
-- [x] **TODO-6.5**: BRAM测试平台创建 ✓ (已完成 2026-04-03)
-  **实现文件**: `testbench/litho_system_bram_tb.cpp`
+- [x] **TODO-6.A.3**: BRAM测试平台创建 ✓ (已完成 2026-04-03)
+  **实现文件**: `testbench/litho_system_bram_tb.cpp` (398行)
   
-  **测试内容**:
+  **7个测试用例**:
   ```
-  ✓ 数据加载接口测试
-  ✓ SOCS模式完整功能验证 (8核计算)
-  ✓ TCC模式Nx=3限制验证
-  ✓ 参数验证测试 (Lx/Ly/Nx边界检查)
-  ✓ BRAM存储重置测试
+  ✓ Test 1: 单数据加载/读取功能验证
+  ✓ Test 2: 批量数据加载功能验证
+  ✓ Test 3: 计算状态管理验证
+  ✓ Test 4: TCC模式计算验证 (Nx≤3)
+  ✓ Test 5: SOCS模式计算验证 (8核)
+  ✓ Test 6: 参数验证和错误处理
+  ✓ Test 7: 存储复位功能验证
   ```
+
+- [x] **TODO-6.A.4**: HLS配置文件创建 ✓ (已完成 2026-04-03)
+  **实现文件**:
+  - `script/hls_config_bram.cfg` - HLS项目配置
+  - `script/run_csynth_bram.py` - C仿真运行脚本
+  - `script/compile_standalone_test.py` - 独立编译测试
   
-  **测试用例**:
+  **目标设备**: xcku3p-ffvb2104-2-e
+  **目标频率**: 200MHz (5ns时钟周期)
+  **目标资源**: BRAM ≤ 105块 (留10%余量)
+
+**Phase 6A完成总结**:
+- ✓ HLS头文件、实现文件、测试平台已创建
+- ✓ HLS配置文件和运行脚本已创建
+- ✓ 独立编译测试脚本已创建 (无Vitis环境验证)
+- ⏳ C仿真验证待运行 (需要Vitis HLS环境)
+- ⏳ HLS综合验证待运行 (需要Vitis HLS环境)
   - `test_data_loading()` - 验证数据加载接口
   - `test_socs_mode()` - SOCS模式完整计算
   - `test_tcc_mode()` - TCC模式Nx=3计算
@@ -984,7 +984,7 @@
 | Phase 3 | Day 3    | Day 7    | ✅ 已完成 | 100%   |
 | Phase 4 | Day 8    | Day 10   | ✅ 已完成 | 100%   |
 | Phase 5 | Day 11   | Day 14   | ✅ 已完成 | 100%   |
-| Phase 6 | Day 15   | Day 21   | 🔄 待硬件 | 10%    |
+| Phase 6 | Day 15   | Day 21   | 🔄 进行中 | 20%    |
 
 ### Phase 3 详细进度 (2026-04-03) ✅ 已完成
 
@@ -1085,6 +1085,8 @@ vitis-run --mode hls --csim --config script\hls_config_system.cfg --work_dir hls
 | 2026-04-03 | Phase 5 Host应用开发: XRT/OpenCL/Python主机程序完成               |
 | 2026-04-03 | Phase 5 完成: RTL Co-Sim/IP导出/Host开发, 整体完成率100%          |
 | 2026-04-03 | 阶段总结: 创建WORKSPACE_STRUCTURE.md和PHASE_SUMMARY_REPORT.md文档 |
+| 2026-04-03 | Phase 6D 完成: Python驱动验证通过 (6/6测试), 接口设计验证完成     |
+| 2026-04-03 | Phase 6A 完成: HLS代码实现完成 (头文件/实现/testbench/配置脚本)   |
 
 ---
 
