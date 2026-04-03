@@ -21,6 +21,10 @@
 typedef std::complex<float> cmpxFloat;
 typedef float realFloat;
 
+// 别名定义 (兼容不同命名风格)
+typedef cmpxFloat complex_float;   // SOCS模块使用
+typedef realFloat float_real;      // 实数类型别名
+
 // 定点数类型 (用于资源优化测试)
 // 格式: ap_fixed<W, I> 其中 W=总位宽, I=整数位宽
 typedef ap_fixed<32, 16> fixed32_t;   // 32位定点数, 16位整数部分
