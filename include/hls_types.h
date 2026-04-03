@@ -10,8 +10,58 @@
 
 #include <complex>
 #include <cmath>
-#include "ap_fixed.h"
-#include "hls_fft.h"
+
+// 支持standalone编译 (无Vitis HLS环境)
+#ifdef STANDALONE_COMPILE
+    // Standalone模式下定义简化的ap_fixed类型
+    template<int W, int I>
+    class ap_fixed {
+    public:
+        ap_fixed() : val(0) {}
+        ap_fixed(double v) : val(v) {}
+        ap_fixed(float v) : val(v) {}
+        double to_double() const { return val; }
+        float to_float() const { return (float)val; }
+        ap_fixed operator+(const ap_fixed& rhs) const { return ap_fixed(val + rhs.val); }
+        ap_fixed operator-(const ap_fixed& rhs) const { return ap_fixed(val - rhs.val); }
+        ap_fixed operator*(const ap_fixed& rhs) const { return ap_fixed(val * rhs.val); }
+        ap_fixed operator/(const ap_fixed& rhs) const { return ap_fixed(val / rhs.val); }
+    private:
+        double val;
+    };
+    
+    template<int W>
+    class ap_int {
+    public:
+        ap_int() : val(0) {}
+        ap_int(int v) : val(v) {}
+        int to_int() const { return val; }
+        ap_int operator+(const ap_int& rhs) const { return ap_int(val + rhs.val); }
+        ap_int operator-(const ap_int& rhs) const { return ap_int(val - rhs.val); }
+        ap_int operator|(const ap_int& rhs) const { return ap_int(val | rhs.val); }
+        ap_int operator<<(int shift) const { return ap_int(val << shift); }
+    private:
+        int val;
+    };
+    
+    template<int W>
+    class ap_uint {
+    public:
+        ap_uint() : val(0) {}
+        ap_uint(unsigned int v) : val(v) {}
+        ap_uint(int v) : val((unsigned int)v) {}
+        unsigned int to_uint() const { return val; }
+        ap_uint operator|(const ap_uint& rhs) const { return ap_uint(val | rhs.val); }
+        ap_uint operator<<(int shift) const { return ap_uint(val << shift); }
+    private:
+        unsigned int val;
+    };
+    
+    #define HLS_PRAGMA(x)  // 空定义，忽略HLS pragma
+#else
+    #include "ap_fixed.h"
+    #include "hls_fft.h"
+#endif
 
 // ============================================================
 // 基础数据类型定义
@@ -38,6 +88,9 @@ typedef std::complex<fixed24_t> cmpxFixed24;
 // ============================================================
 // FFT参数配置 (完全匹配 interface_stream/fft_top.h)
 // ============================================================
+
+#ifndef STANDALONE_COMPILE
+// FFT配置仅在HLS环境下有效
 
 // 可配置参数 - 完全匹配interface_stream/fft_top.h
 const char FFT_INPUT_WIDTH                     = 16;  // 输入数据位宽 (定点数)
@@ -102,9 +155,15 @@ typedef hls::ip_fft::status_t<config1> status_t;
 // 保持原有fft_config_t兼容性（deprecated，建议使用config1）
 typedef config1 fft_config_t;
 
+#else
+// Standalone编译模式下跳过FFT相关定义
+#endif // STANDALONE_COMPILE
+
 // ============================================================
 // FFT缩放策略 (scaled模式)
 // ============================================================
+
+#ifndef STANDALONE_COMPILE
 
 // 固定缩放策略：每级缩放1bit
 // 0x1555 = 01 01 01 01 01... (每2位控制一级)
@@ -277,5 +336,7 @@ inline cmpxFloat complex_mult(cmpxFloat a, cmpxFloat b) {
 inline cmpxFloat complex_conj(cmpxFloat a) {
     return cmpxFloat(a.real(), -a.imag());
 }
+
+#endif // STANDALONE_COMPILE
 
 #endif // HLS_TYPES_H
