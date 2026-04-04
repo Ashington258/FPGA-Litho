@@ -33,13 +33,14 @@
 //=============================================================================
 
 // BRAM存储尺寸限制
+// 注意: 这些值影响寄存器位宽，设置过小会导致寄存器被优化截断
 constexpr int BRAM_MAX_LX = 64;           // 最大频域X尺寸
 constexpr int BRAM_MAX_LY = 64;           // 最大频域Y尺寸
-constexpr int BRAM_MAX_NX_TCC = 3;        // TCC模式最大Nx (BRAM容量限制)
+constexpr int BRAM_MAX_NX_TCC = 15;       // TCC模式最大Nx (增大以支持更大范围)
 constexpr int BRAM_MAX_NX_SOCS = 15;      // SOCS模式最大Nx
 constexpr int BRAM_MAX_NY = 15;           // 最大Ny
 constexpr int BRAM_MAX_KERNELS = 8;       // 最大SOCS核数量
-constexpr int BRAM_MAX_SRC_SIZE = 64;     // 最大光源尺寸
+constexpr int BRAM_MAX_SRC_SIZE = 256;    // 最大光源尺寸 (增大)
 
 // BRAM存储数组尺寸
 constexpr int BRAM_SOURCE_SIZE = BRAM_MAX_LX * BRAM_MAX_LY;           // 4096
