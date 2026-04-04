@@ -66,6 +66,84 @@ Resources:
 
 ---
 
+### 4. BRAM版本 (Phase 6) - ✅ 完成
+
+**目标**: 为xcku3p FPGA板卡开发无DDR依赖的纯BRAM版本
+
+**约束**: 
+- TCC模式: Nx ≤ 3
+- SOCS模式: nkernels ≤ 8
+- 数据大小: Lx, Ly ≤ 64
+
+#### 设计架构
+
+**单函数架构 (Phase 6C)**:
+- 操作切换模式 (operation switch): 10种操作
+- 静态本地BRAM数组 (static local arrays)
+- BIND_STORAGE pragma在函数作用域
+
+#### 操作码定义
+
+| 操作码 | 操作名 | 功能 |
+|--------|--------|------|
+| 0 | OP_LOAD_SOURCE | 加载源数据 |
+| 1 | OP_LOAD_MASK | 加载mask数据 |
+| 2 | OP_LOAD_TCC | 加载TCC矩阵 |
+| 3 | OP_LOAD_KERNELS | 加载核函数 |
+| 4 | OP_LOAD_SCALES | 加载缩放因子 |
+| 5 | OP_COMPUTE_TCC | TCC模式计算 |
+| 6 | OP_COMPUTE_SOCS | SOCS模式计算 |
+| 7 | OP_READ_IMGF | 读取频域图像 |
+| 8 | OP_READ_IMG_OUT | 读取输出图像 |
+| 9 | OP_RESET | 重置所有BRAM |
+
+#### HLS综合结果
+
+```
+Target Clock: 5ns (200MHz)
+Estimated Fmax: 287.11 MHz
+Timing Slack: +1.52ns ✓
+
+Resources:
+  BRAM_18K: 131 (18%)
+  DSP: 27 (1%)
+  FF: 5,083 (2%)
+  LUT: 8,346 (5%)
+```
+
+**核心文件**:
+- `src/hls_litho_system_bram.cpp` - BRAM版本核心
+- `include/hls_litho_system_bram.h` - 头文件
+- `testbench/litho_system_bram_tb.cpp` - 测试台 (10测试全过)
+- `host/litho_host_bram.py` - Python驱动
+- `host/test_bram_interface.py` - Python接口测试 (18/18通过)
+
+#### 关键技术点
+
+1. **BIND_STORAGE作用域**: 必须在函数作用域内，全局数组不生效
+2. **静态本地数组**: 保证BRAM数据在函数调用间持久化
+3. **ARRAY_PARTITION**: 循环分区(cyclic factor=4/8)实现并行访问
+4. **参数验证**: 运行时检查Nx≤3, nkernels≤8约束
+
+#### Python驱动接口
+
+```python
+from litho_host_bram import BRAMKernel, LithoBRAMApp
+
+# 初始化
+kernel = BRAMKernel('litho_bram.xclbin')
+
+# TCC模式
+app = LithoBRAMApp(mode='tcc')
+result = app.run_tcc_mode(source, mask, tcc_data)
+
+# SOCS模式
+app = LithoBRAMApp(mode='socs')
+result = app.run_socs_mode(mask, kernels, scales)
+```
+
+---
+
 ## 目录结构 (整理后)
 
 ```
@@ -168,13 +246,13 @@ part  = xcku3p-ffvb676-2-e
 
 ## 下一步计划
 
-1. **Phase 3.C**: 开发calcSOCS模块
-2. **系统集成**: 集成TCC + calcImage + calcSOCS
-3. **Vivado集成**: HLS IP导出与硬件集成
-4. **性能验证**: 端到端功能与性能测试
+1. **Phase 6E**: 创建xclbin并测试硬件
+2. **Vivado集成**: HLS IP导出与硬件集成
+3. **性能验证**: 端到端功能与性能测试
+4. **文档完善**: 用户手册和API文档
 
 ---
 
-**报告日期**: 2026年4月2日
+**报告日期**: 2026年4月4日
 **版本**: Vitis HLS 2025.2
-**状态**: Phase 3.A/3.B 完成
+**状态**: Phase 3.A/3.B/6完成
