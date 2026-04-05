@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS TCC Module HLS C Simulation Test Bench
+ * FPGA-Litho HLS TCC Module HLS C Simulation Test Bench
  * TCC模块HLS C仿真专用测试平台
  * 
  * 用于Vitis HLS C仿真 (csim) 验证
@@ -99,7 +99,7 @@ bool verify_tcc_nonzero(cmpxFloat tcc[7 * 7], int tccSize) {
 // ============================================================
 
 int main() {
-    cout << "K-Litho HLS TCC C Simulation Test" << endl;
+    cout << "FPGA-Litho HLS TCC C Simulation Test" << endl;
     cout << "=================================" << endl;
     cout << endl;
     

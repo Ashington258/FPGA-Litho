@@ -1,5 +1,5 @@
 # =============================================================================
-# K-Litho System Integration Synthesis Script
+# FPGA-Litho System Integration Synthesis Script
 # =============================================================================
 # 
 # 运行方式: vitis-run --mode hls --tcl script/run_csynth_system.tcl --work_dir hls_system_proj

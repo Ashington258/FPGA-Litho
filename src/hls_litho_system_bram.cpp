@@ -1,6 +1,6 @@
 /**
  * @file hls_litho_system_bram.cpp
- * @brief K-Litho BRAM Single-Function Architecture (Phase 6C Refactor)
+ * @brief FPGA-Litho BRAM Single-Function Architecture (Phase 6C Refactor)
  * 
  * 单函数架构 - 所有BRAM操作通过operation参数控制
  * 
@@ -13,7 +13,7 @@
  * - 静态变量保证数据在调用间持久化
  * - 预期资源: ~57 BRAM_18K blocks
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-04
  */
 

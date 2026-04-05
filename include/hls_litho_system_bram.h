@@ -1,6 +1,6 @@
 /**
  * @file hls_litho_system_bram.h
- * @brief K-Litho BRAM Single-Function Interface (Phase 6C Refactor)
+ * @brief FPGA-Litho BRAM Single-Function Interface (Phase 6C Refactor)
  * 
  * 单函数架构 - 所有BRAM操作通过operation参数控制
  * 
@@ -18,7 +18,7 @@
  * - img_out_bram: 4096 x 32bit = 8 BRAM_18K
  * - Total: ~57 BRAM_18K blocks
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-04
  */
 

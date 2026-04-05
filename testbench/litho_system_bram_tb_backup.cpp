@@ -1,6 +1,6 @@
 /**
  * @file litho_system_bram_tb.cpp
- * @brief K-Litho BRAM接口测试平台
+ * @brief FPGA-Litho BRAM接口测试平台
  * 
  * 测试目标:
  * 1. 单数据加载/读取功能
@@ -11,7 +11,7 @@
  * 6. 参数验证和错误处理
  * 7. 存储复位功能
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-03
  */
 
@@ -495,7 +495,7 @@ bool test_reset_functionality() {
 
 int main() {
     cout << "========================================" << endl;
-    cout << "K-Litho BRAM Interface Testbench" << endl;
+    cout << "FPGA-Litho BRAM Interface Testbench" << endl;
     cout << "========================================" << endl;
     cout << "Testing BRAM storage and AXI-Lite interface..." << endl;
     cout << "Target: xcku3p FPGA (No DDR)" << endl;

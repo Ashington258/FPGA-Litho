@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS Mask Generation Module
+ * FPGA-Litho HLS Mask Generation Module
  * 掩模生成模块
  * 
  * 替代原始函数: mask.cpp:generateLineSpace(), createMask()

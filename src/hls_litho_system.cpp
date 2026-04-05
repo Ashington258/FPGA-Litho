@@ -1,10 +1,10 @@
 /**
  * @file hls_litho_system.cpp
- * @brief K-Litho Complete System Integration Implementation
+ * @brief FPGA-Litho Complete System Integration Implementation
  * 
  * 实现完整的光刻模拟系统集成，支持TCC和SOCS两种工作模式
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-03
  */
 

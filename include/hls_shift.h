@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS Shift Header
+ * FPGA-Litho HLS Shift Header
  * 2D循环移位头文件
  */
 

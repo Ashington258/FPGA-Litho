@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS FFT C2R Header
+ * FPGA-Litho HLS FFT C2R Header
  * FFT复数到实数变换头文件
  * 
  * 重构版本：移除手动输入重组函数声明

@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS Testbench
+ * FPGA-Litho HLS Testbench
  * FFT模块测试平台
  * 
  * 参考: interface_stream/fft_tb.cpp
@@ -215,7 +215,7 @@ bool verify_against_golden(const std::vector<cmpxFixedOut>& output,
 
 int main() {
     std::cout << "========================================" << std::endl;
-    std::cout << "K-Litho HLS FFT Testbench" << std::endl;
+    std::cout << "FPGA-Litho HLS FFT Testbench" << std::endl;
     std::cout << "========================================" << std::endl;
     std::cout << "Test size: " << TB_SIZE_X << " x " << TB_SIZE_Y << std::endl;
     std::cout << "Error threshold: " << ERROR_THRESHOLD << std::endl;

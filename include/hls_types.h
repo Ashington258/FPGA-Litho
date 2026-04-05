@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS Types Definition
+ * FPGA-Litho HLS Types Definition
  * Copyright 2026
  * 
  * 定义HLS工程使用的数据类型和常量

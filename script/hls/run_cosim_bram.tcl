@@ -1,7 +1,7 @@
-# K-Litho BRAM Version Co-Simulation Script
+# FPGA-Litho BRAM Version Co-Simulation Script
 # Phase 6E: RTL Verification
 #
-# @author K-Litho Team
+# @author FPGA-Litho Team
 # @date 2026-04-04
 
 # Open existing project

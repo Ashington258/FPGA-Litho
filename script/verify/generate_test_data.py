@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-K-Litho BRAM 测试数据生成脚本
+FPGA-Litho BRAM 测试数据生成脚本
 生成用于完整功能验证的测试数据文件
 """
 

@@ -108,7 +108,7 @@ create_bd_design "litho_system"
 
 ```tcl
 # 添加HLS IP到Block Design
-create_bd_cell -type ip -vlnv k-litho.org:hls:hls_litho_system:1.0 hls_litho_0
+create_bd_cell -type ip -vlnv fpga-litho.org:hls:hls_litho_system:1.0 hls_litho_0
 
 # 查看IP接口
 report_ip_status [get_ips hls_litho_system_0]
@@ -435,7 +435,7 @@ if __name__ == "__main__":
 
 ```bash
 # 运行CPU参考实现
-cd ../CPP_project/K-Litho-TCC
+cd ../CPP_project/FPGA-Litho-TCC
 ./klitho_tcc --benchmark
 
 # 记录CPU执行时间

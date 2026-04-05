@@ -1,10 +1,10 @@
 /**
  * @file litho_host_opencl.cpp
- * @brief K-Litho OpenCL Host Application (Alternative implementation)
+ * @brief FPGA-Litho OpenCL Host Application (Alternative implementation)
  * 
  * 使用标准OpenCL API的主机程序，兼容更多平台
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-03
  */
 
@@ -161,7 +161,7 @@ public:
 };
 
 //=============================================================================
-// K-Litho OpenCL内核管理
+// FPGA-Litho OpenCL内核管理
 //=============================================================================
 
 class LithoOpenCLKernel {
@@ -295,7 +295,7 @@ int run_litho_opencl(int argc, char* argv[]) {
     }
     
     std::cout << "========================================\n";
-    std::cout << "  K-Litho OpenCL Host Application\n";
+    std::cout << "  FPGA-Litho OpenCL Host Application\n";
     std::cout << "========================================\n\n";
     
     try {
@@ -457,7 +457,7 @@ int run_litho_opencl(int argc, char* argv[]) {
             std::cout << "Avg time: " << avg_time << " us\n";
         }
         
-        std::cout << "\nK-Litho OpenCL completed successfully!\n";
+        std::cout << "\nFPGA-Litho OpenCL completed successfully!\n";
         return 0;
         
     } catch (const std::exception& e) {

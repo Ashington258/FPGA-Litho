@@ -1,7 +1,7 @@
 # FPGA-Litho存储方案比较分析
 
 > 创建日期: 2026-04-03
-> 作者: K-Litho Team
+> 作者: FPGA-Litho Team
 > 目标: 分析不同FPGA存储方案的优缺点，为硬件选择提供参考
 
 ---

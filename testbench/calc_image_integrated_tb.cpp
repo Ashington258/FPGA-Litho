@@ -4,7 +4,7 @@
  * 
  * Tests the 200MHz verified calcImage implementation
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-02
  */
 

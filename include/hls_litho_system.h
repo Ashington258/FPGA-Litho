@@ -1,6 +1,6 @@
 /**
  * @file hls_litho_system.h
- * @brief K-Litho Complete System Integration Header
+ * @brief FPGA-Litho Complete System Integration Header
  * 
  * 系统集成架构 - 支持TCC和SOCS两种工作模式
  * 
@@ -17,7 +17,7 @@
  * - calcImage: II=4 @ 273MHz verified  
  * - SOCS模块: II=1 @ 290MHz verified
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-03
  */
 

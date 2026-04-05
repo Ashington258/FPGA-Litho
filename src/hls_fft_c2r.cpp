@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS FFT C2R Module
+ * FPGA-Litho HLS FFT C2R Module
  * 复数到实数IFFT变换
  * 
  * 重构版本：移除手动输入重组，简化流程

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-K-Litho BRAM Python Host Application (Phase 6D)
+FPGA-Litho BRAM Python Host Application (Phase 6D)
 
 BRAM版本的Python驱动程序 - 单函数架构
 
@@ -16,7 +16,7 @@ BRAM版本的Python驱动程序 - 单函数架构
 - OP_READ_IMG_OUT (8): 读取img_out结果
 - OP_RESET (9): 重置所有BRAM存储
 
-@author K-Litho Team
+@author FPGA-Litho Team
 @date 2026-04-04
 """
 
@@ -477,7 +477,7 @@ class BRAMKernel:
 #=============================================================================
 
 class LithoBRAMApp:
-    """K-Litho BRAM应用高级接口"""
+    """FPGA-Litho BRAM应用高级接口"""
     
     def __init__(self, device_index=0, xclbin_path=None, verbose=False):
         self.verbose = verbose
@@ -572,7 +572,7 @@ class LithoBRAMApp:
 #=============================================================================
 
 def main():
-    parser = argparse.ArgumentParser(description="K-Litho BRAM Host Application")
+    parser = argparse.ArgumentParser(description="FPGA-Litho BRAM Host Application")
     
     parser.add_argument("-d", "--device", type=int, default=0,
                        help="Device index (default: 0)")
@@ -597,7 +597,7 @@ def main():
     args = parser.parse_args()
     
     print("========================================")
-    print("K-Litho BRAM Host Application")
+    print("FPGA-Litho BRAM Host Application")
     print("Phase 6D: Single-Function Architecture")
     print("========================================")
     print(f"Mode: {'TCC' if args.mode == 1 else 'SOCS'}")

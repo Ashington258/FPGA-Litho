@@ -1,14 +1,14 @@
 /**
  * @file litho_host.cpp
- * @brief K-Litho XRT Host Application
+ * @brief FPGA-Litho XRT Host Application
  * 
- * XRT/OpenCL主机程序，用于控制K-Litho光刻模拟FPGA内核
+ * XRT/OpenCL主机程序，用于控制FPGA-Litho光刻模拟FPGA内核
  * 
  * 支持两种工作模式:
  * - TCC模式: 计算频域图像 (mode=1)
  * - SOCS模式: 计算空间域图像 (mode=2)
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-03
  */
 
@@ -62,7 +62,7 @@ struct HostArgs {
 };
 
 void print_usage(const char* prog_name) {
-    std::cout << "K-Litho XRT Host Application\n";
+    std::cout << "FPGA-Litho XRT Host Application\n";
     std::cout << "Usage: " << prog_name << " [options]\n\n";
     std::cout << "Options:\n";
     std::cout << "  --xclbin <file>       XCLBIN file path (required)\n";
@@ -339,7 +339,7 @@ private:
 };
 
 //=============================================================================
-// K-Litho内核管理
+// FPGA-Litho内核管理
 //=============================================================================
 
 class LithoKernel {
@@ -574,7 +574,7 @@ int run_litho(HostArgs& args) {
             std::cout << "Avg time: " << avg_time << " μs\n";
         }
         
-        std::cout << "\nK-Litho execution completed successfully!\n";
+        std::cout << "\nFPGA-Litho execution completed successfully!\n";
         return 0;
         
     } catch (const std::exception& e) {
@@ -589,7 +589,7 @@ int run_litho(HostArgs& args) {
 
 int main(int argc, char* argv[]) {
     std::cout << "========================================\n";
-    std::cout << "  K-Litho XRT Host Application\n";
+    std::cout << "  FPGA-Litho XRT Host Application\n";
     std::cout << "  (TCC & SOCS Lithography Simulation)\n";
     std::cout << "========================================\n\n";
     

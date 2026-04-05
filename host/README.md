@@ -1,6 +1,6 @@
-# K-Litho Host Applications
+# FPGA-Litho Host Applications
 
-本目录包含K-Litho光刻模拟FPGA内核的主机应用程序。
+本目录包含FPGA-Litho光刻模拟FPGA内核的主机应用程序。
 
 ## 目录结构
 
@@ -246,4 +246,4 @@ xbutil validate
 - [XRT Documentation](https://xilinx.github.io/XRT/)
 - [OpenCL Specification](https://www.khronos.org/opencl/)
 - [Vitis HLS User Guide (UG1399)](https://docs.amd.com/)
-- [K-Litho Project Documentation](../doc/PROJECT_SUMMARY.md)
+- [FPGA-Litho Project Documentation](../doc/PROJECT_SUMMARY.md)

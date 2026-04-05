@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS TCC Calculation Module Header
+ * FPGA-Litho HLS TCC Calculation Module Header
  * TCC矩阵计算HLS模块头文件
  * 
  * 实现功能:

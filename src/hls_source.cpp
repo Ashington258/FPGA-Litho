@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS Source Generation Module
+ * FPGA-Litho HLS Source Generation Module
  * 光源生成模块
  * 
  * 替代原始函数: source.cpp:createAnnular(), createDipole(), createCrossQuadrupole()

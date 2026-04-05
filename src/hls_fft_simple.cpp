@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS Simplified FFT Module
+ * FPGA-Litho HLS Simplified FFT Module
  * 简化版FFT模块 - 使用定点数 (hls::fft原生支持)
  * 
  * 重要修复：参考Vitis官方 interface_stream 实现

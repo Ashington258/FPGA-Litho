@@ -8,7 +8,7 @@
  * - Estimated Fmax: 273.97 MHz ✓ PASS
  * - Timing slack: 73MHz margin
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-02
  */
 

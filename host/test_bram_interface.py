@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-K-Litho BRAM Interface Mock Test (Phase 6D)
+FPGA-Litho BRAM Interface Mock Test (Phase 6D)
 
 纯Python模拟测试BRAM接口，无需实际硬件
 验证Python驱动逻辑和接口匹配
 
-@author K-Litho Team
+@author FPGA-Litho Team
 @date 2026-04-04
 """
 
@@ -324,7 +324,7 @@ def test_batch_operations(kernel):
 
 def main():
     print("========================================")
-    print("K-Litho BRAM Interface Mock Test")
+    print("FPGA-Litho BRAM Interface Mock Test")
     print("Phase 6D: Python Driver Verification")
     print("========================================")
     print(f"BRAM_MAX_LX = {BRAM_MAX_LX}")

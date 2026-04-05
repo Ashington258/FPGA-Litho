@@ -1,7 +1,7 @@
-# K-Litho BRAM Version IP Package Script
+# FPGA-Litho BRAM Version IP Package Script
 # Phase 6E: Export Vitis Kernel IP
 #
-# @author K-Litho Team
+# @author FPGA-Litho Team
 # @date 2026-04-04
 
 # Open existing project

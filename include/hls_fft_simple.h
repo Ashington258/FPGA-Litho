@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS Simplified FFT Header
+ * FPGA-Litho HLS Simplified FFT Header
  * 参考Vitis官方 interface_stream/fft_top.h 实现
  */
 

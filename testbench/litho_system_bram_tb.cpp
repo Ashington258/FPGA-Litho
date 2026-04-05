@@ -5,7 +5,7 @@
  * 测试所有10种操作（load×5, compute×2, read×2, reset）
  * 验证BRAM存储、参数验证、计算功能
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-04
  */
 
@@ -23,7 +23,7 @@ bool complex_equal(cmpxFloat a, cmpxFloat b, float tolerance = 1e-5f) {
 
 int main() {
     cout << "========================================" << endl;
-    cout << "K-Litho BRAM Single-Function Testbench" << endl;
+    cout << "FPGA-Litho BRAM Single-Function Testbench" << endl;
     cout << "========================================" << endl;
     cout << "Phase 6C: Single-Function Architecture" << endl;
     cout << "Target: xcku3p FPGA (No DDR)" << endl;

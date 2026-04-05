@@ -1,10 +1,10 @@
 /**
  * @file litho_system_tb.cpp
- * @brief K-Litho System Integration Testbench
+ * @brief FPGA-Litho System Integration Testbench
  * 
  * 测试TCC和SOCS两种工作模式的系统集成
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-03
  */
 
@@ -308,7 +308,7 @@ int test_socs_accumulation() {
 
 int main() {
     cout << "========================================" << endl;
-    cout << "K-Litho System Integration Test" << endl;
+    cout << "FPGA-Litho System Integration Test" << endl;
     cout << "========================================" << endl;
     cout << "Testing TCC and SOCS modes..." << endl << endl;
     

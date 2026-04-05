@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-K-Litho XRT Python Host Application
+FPGA-Litho XRT Python Host Application
 
-基于PyXRT的Python主机程序，用于控制K-Litho光刻模拟FPGA内核
+基于PyXRT的Python主机程序，用于控制FPGA-Litho光刻模拟FPGA内核
 
 支持两种工作模式:
 - TCC模式: 计算频域图像 (mode=1)
 - SOCS模式: 计算空间域图像 (mode=2)
 
-@author K-Litho Team
+@author FPGA-Litho Team
 @date 2026-04-03
 """
 
@@ -144,11 +144,11 @@ class LithoDevice:
         print(f"UUID: {self.uuid}")
 
 #=============================================================================
-# K-Litho内核管理
+# FPGA-Litho内核管理
 #=============================================================================
 
 class LithoKernel:
-    """K-Litho内核管理类"""
+    """FPGA-Litho内核管理类"""
     
     def __init__(self, device, kernel_name="hls_litho_system", verbose=False):
         self.device = device
@@ -219,7 +219,7 @@ class LithoKernel:
 #=============================================================================
 
 def run_litho(args):
-    """运行K-Litho内核"""
+    """运行FPGA-Litho内核"""
     
     # 初始化设备
     device = LithoDevice(args.device, args.xclbin, args.verbose)
@@ -341,14 +341,14 @@ def run_litho(args):
         print(f"Max time: {max_time:.2f} us")
         print(f"Avg time: {avg_time:.2f} us")
     
-    print("\nK-Litho completed successfully!")
+    print("\nFPGA-Litho completed successfully!")
 
 #=============================================================================
 # 主函数
 #=============================================================================
 
 def main():
-    parser = argparse.ArgumentParser(description='K-Litho XRT Host Application')
+    parser = argparse.ArgumentParser(description='FPGA-Litho XRT Host Application')
     
     # 必需参数
     parser.add_argument('--xclbin', required=True, help='XCLBIN file path')
@@ -385,7 +385,7 @@ def main():
     args = parser.parse_args()
     
     print("=" * 40)
-    print("  K-Litho XRT Python Host Application")
+    print("  FPGA-Litho XRT Python Host Application")
     print("  (TCC & SOCS Lithography Simulation)")
     print("=" * 40)
     print()

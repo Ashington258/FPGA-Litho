@@ -1,6 +1,6 @@
 /**
  * @file hls_litho_system_bram.h
- * @brief K-Litho BRAM Interface Header (无DDR板卡版本)
+ * @brief FPGA-Litho BRAM Interface Header (无DDR板卡版本)
  * 
  * BRAM存储接口架构 - 支持TCC和SOCS两种工作模式
  * 
@@ -18,7 +18,7 @@
  * 
  * 地址映射: 参考 doc/BRAM_INTERFACE_MAPPING.md
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-03
  */
 

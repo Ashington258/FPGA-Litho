@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS Shift Module
+ * FPGA-Litho HLS Shift Module
  * 数据循环移位模块
  * 
  * 替代原始函数: klitho_tcc.cpp:myShift()

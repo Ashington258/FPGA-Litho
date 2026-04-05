@@ -1,11 +1,11 @@
 /*
- * K-Litho HLS Top Module Header
+ * FPGA-Litho HLS Top Module Header
  * 光刻模拟顶层集成模块头文件
  * 
  * 时钟约束: 5ns (200MHz)
  * - calcImage: II=4 @ 200MHz (Fmax: 273MHz verified)
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-02 (Updated for 200MHz integration)
  */
 
@@ -76,7 +76,7 @@ void calc_image_integrated_wrapper(
 );
 
 /**
- * @brief K-Litho 顶层集成模块
+ * @brief FPGA-Litho 顶层集成模块
  * 
  * @param source_in   光源数据输入
  * @param mask_in     掩模数据输入

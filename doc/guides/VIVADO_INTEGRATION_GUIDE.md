@@ -1,4 +1,4 @@
-# K-Litho BRAM Version Vivado Integration Guide
+# FPGA-Litho BRAM Version Vivado Integration Guide
 
 ## Phase 6F Alternative: Vivado Flow (No xclbin)
 

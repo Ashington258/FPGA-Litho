@@ -5,7 +5,7 @@
  * Uses AXI-Master interface with 200MHz timing
  * II=4 @ 200MHz (Fmax: 273MHz verified)
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-02
  */
 

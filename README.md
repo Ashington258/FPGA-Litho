@@ -10,7 +10,7 @@
 
 ## 项目简介
 
-FPGA-Litho是一个基于AMD Xilinx Vitis HLS的光刻模拟系统，将K-Litho光学成像算法重构为HLS工程，实现FPGA硬件加速。项目采用**双模式架构**（TCC模式和SOCS模式），覆盖光刻模拟的核心计算流程。
+FPGA-Litho是一个基于AMD Xilinx Vitis HLS的光刻模拟系统，将FPGA-Litho光学成像算法重构为HLS工程，实现FPGA硬件加速。项目采用**双模式架构**（TCC模式和SOCS模式），覆盖光刻模拟的核心计算流程。
 
 ### 目标加速比
 
@@ -229,7 +229,7 @@ set_property ip_repo_paths {hls_litho_system_proj/solution1/impl/ip} [current_pr
 update_ip_catalog
 
 # 添加IP到Block Design
-create_ip -name hls_litho_system -vendor k-litho.org -library hls -version 1.0
+create_ip -name hls_litho_system -vendor fpga-litho.org -library hls -version 1.0
 ```
 
 ### 3. 主机程序运行
@@ -297,7 +297,7 @@ python litho_host.py --xclbin hls_litho_system.xclbin --mode 1
 
 ### 光刻模拟算法
 
-基于K-Litho模型实现：
+基于FPGA-Litho模型实现：
 
 - **TCC (Transmission Cross Coefficients)**: 光学系统传输特性矩阵
 - **SOCS (Sum of Coherent Systems)**: 快速光学成像方法
@@ -332,7 +332,7 @@ Copyright 2026
 
 ---
 
-**注意**: 本项目为学术研究用途，光刻模拟算法基于K-Litho模型简化实现。当前核心开发已完成，待板级验证确认实际性能。
+**注意**: 本项目为学术研究用途，光刻模拟算法基于FPGA-Litho模型简化实现。当前核心开发已完成，待板级验证确认实际性能。
 - 流式接口设计 (`hls::stream`)
 - natural_order输出模式
 
@@ -350,4 +350,4 @@ Copyright 2026
 
 ---
 
-**注意**: 本项目为学术研究用途，光刻模拟算法基于K-Litho模型简化实现。
+**注意**: 本项目为学术研究用途，光刻模拟算法基于FPGA-Litho模型简化实现。

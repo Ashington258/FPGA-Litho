@@ -1,5 +1,5 @@
 # =============================================================================
-# K-Litho System Export Script (XO/IP Package)
+# FPGA-Litho System Export Script (XO/IP Package)
 # =============================================================================
 # 
 # 运行方式: vitis-run --mode hls --tcl script/run_package_system.tcl --work_dir hls_litho_system_proj
@@ -29,10 +29,10 @@ puts "=========================================="
 
 # 生成Vivado IP (用于Vivado IP集成器)
 export_design -format ip_catalog \
-              -description "K-Litho Lithography Simulation System" \
-              -vendor "k-litho.org" \
+              -description "FPGA-Litho Lithography Simulation System" \
+              -vendor "fpga-litho.org" \
               -version "1.0" \
-              -display_name "K-Litho System"
+              -display_name "FPGA-Litho System"
 
 # 复制生成的IP到输出目录
 file mkdir "ip_export"

@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS Top Module
+ * FPGA-Litho HLS Top Module
  * 光刻模拟顶层集成模块
  * 
  * 数据流架构:
@@ -9,7 +9,7 @@
  * - FFT模块: 支持200MHz
  * - calcImage: II=4 @ 200MHz (Fmax: 273MHz verified)
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-02 (Updated for 200MHz integration)
  */
 
@@ -177,7 +177,7 @@ void calc_image_integrated_wrapper(
 // ============================================================
 
 /**
- * @brief K-Litho 顶层集成模块
+ * @brief FPGA-Litho 顶层集成模块
  * 
  * @param source_in   光源数据输入 (可选, 也可使用内部生成)
  * @param mask_in     掩模数据输入

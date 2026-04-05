@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS TCC Calculation Module Implementation
+ * FPGA-Litho HLS TCC Calculation Module Implementation
  * TCC矩阵计算HLS模块实现
  * 
  * 核心优化策略:

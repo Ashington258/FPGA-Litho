@@ -1,6 +1,6 @@
 /**
  * @file hls_litho_system_bram.cpp
- * @brief K-Litho BRAM Interface Implementation (无DDR板卡版本)
+ * @brief FPGA-Litho BRAM Interface Implementation (无DDR板卡版本)
  * 
  * 实现特性:
  * - 本地BRAM存储: ~115KB (65块18Kb BRAM)
@@ -10,7 +10,7 @@
  * 
  * 设计参考: doc/BRAM_INTERFACE_MAPPING.md
  * 
- * @author K-Litho Team
+ * @author FPGA-Litho Team
  * @date 2026-04-03
  */
 

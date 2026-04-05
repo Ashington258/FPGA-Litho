@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS Testbench - Simplified FFT Test
+ * FPGA-Litho HLS Testbench - Simplified FFT Test
  * 简化版FFT测试 - 直接调用FFT核，不使用DATAFLOW
  * 
  * 使用 scaled 模式:
@@ -186,7 +186,7 @@ bool check_error(const vector<realFloat> &input, const vector<realFloat> &output
 
 int main() {
     cout << "========================================" << endl;
-    cout << "K-Litho HLS FFT Testbench (Direct)" << endl;
+    cout << "FPGA-Litho HLS FFT Testbench (Direct)" << endl;
     cout << "========================================" << endl;
     cout << "Test size: " << TEST_SIZE_X << " x " << TEST_SIZE_Y << endl;
     cout << "FFT length: " << FFT_NFFT_MAX << " (1024 points)" << endl;

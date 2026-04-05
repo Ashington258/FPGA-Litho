@@ -1,5 +1,5 @@
 /*
- * K-Litho HLS FFT R2C Module
+ * FPGA-Litho HLS FFT R2C Module
  * 实数到复数FFT变换
  * 
  * 重构版本：移除手动频域重组，使用natural_order输出

@@ -1,4 +1,4 @@
-# K-Litho BRAM Hardware Manager 验证指南
+# FPGA-Litho BRAM Hardware Manager 验证指南
 
 ## 地址映射（关键信息）
 

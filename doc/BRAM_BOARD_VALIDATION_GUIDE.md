@@ -531,7 +531,7 @@ print(f'Sample values: {source[:5]}')
 
 **问题反馈**: 
 - GitHub Issues: https://github.com/Ashington258/FPGA-Litho/issues
-- 邮件: k-litho@example.org
+- 邮件: fpga-litho@example.org
 
 **相关文档**:
 - [BRAM接口映射](../BRAM_INTERFACE_MAPPING.md)

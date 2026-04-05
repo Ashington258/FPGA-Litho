@@ -1,7 +1,7 @@
 # FPGA-Litho 数据流架构详解
 
 > 创建日期: 2026-04-03  
-> 作者: K-Litho Team  
+> 作者: FPGA-Litho Team  
 > 目标: 详细说明工程数据流、AXI接口配置及具体参数
 
 ---

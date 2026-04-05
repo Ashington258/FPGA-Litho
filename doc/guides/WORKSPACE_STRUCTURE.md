@@ -1,4 +1,4 @@
-# K-Litho FPGA工作空间文件树说明
+# FPGA-Litho FPGA工作空间文件树说明
 
 > 更新日期: 2026-04-03  
 > 项目状态: Phase 5 已完成80% (待板级验证)
@@ -146,7 +146,7 @@ hls_litho_system_proj/
 # Vivado IP包位置
 hls_litho_system_proj/solution1/impl/ip/
 ├── component.xml          # IP定义
-├── k-litho_org_hls_hls_litho_system_1_0.zip  # IP压缩包
+├── fpga-litho_org_hls_hls_litho_system_1_0.zip  # IP压缩包
 ├── hdl/verilog/           # Verilog源码 (95个文件)
 ├── hdl/vhdl/              # VHDL源码 (92个文件)
 ├── drivers/               # 驱动文件 (10个)
