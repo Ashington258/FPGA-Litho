@@ -16,9 +16,9 @@ set_part xcku3p-ffvb676-2-e
 # Create clock
 create_clock -period 5ns -name default
 
-# Export IP for Vitis Kernel flow
-# This creates the kernel.xml and required files for xclbin generation
-export_design -format xo -output hls_litho_system_bram.xo
+# Export IP for Vivado IP Catalog flow
+# This creates the IP for integration in Vivado Block Design
+export_design -format ip_catalog
 
 # Exit
 exit

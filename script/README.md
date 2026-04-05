@@ -4,12 +4,12 @@
 
 ---
 
-## 目录结构（已重组）
+## 目录结构
 
 ```
 script/
 ├── hls/              # HLS综合与仿真脚本 (12个文件)
-├── verify/           # 板级验证脚本 (10个文件)
+├── verify/           # 板级验证脚本 (4个文件)
 ├── build/            # 构建与编译脚本 (3个文件)
 ├── config/           # 配置文件 (9个文件)
 └── README.md         # 本文档
@@ -67,39 +67,97 @@ vivado_hls -f script/hls/run_package_bram.tcl
 
 ---
 
-## 二、板级验证脚本 (`verify/`)
+## 二、板级验证脚本 (`verify/`) ⭐
 
-### 2.1 Vivado Hardware Manager脚本（推荐）
+### 2.1 BRAM硬件测试脚本
 
-| 文件 | 功能 | 平台 |
+| 文件 | 功能 | 状态 |
 |------|------|------|
-| `board_verify_complete.tcl` | ✅ **完整功能验证** | Vivado HM TCL |
-| `board_verify_hardware_manager.tcl` | Hardware Manager脚本 | Vivado HM TCL |
-| `board_verify_vivado.tcl` | Vivado TCL模式 | Vivado TCL |
-| `bram_full_test.tcl` | BRAM完整测试 | Vivado HM TCL |
-| `manual_test.tcl` | 手动测试命令 | Vivado HM TCL |
-| `test_commands.tcl` | 分步测试命令 | Vivado HM TCL |
-| `board_verify_quick.tcl` | 快速验证脚本 | Vivado HM TCL |
+| `bram_test.tcl` | ✅ **BRAM Litho硬件测试** | **推荐使用** |
+| `generate_test_data.py` | 测试数据生成 | 辅助工具 |
+| `QUICK_REFERENCE.md` | 快速参考指南 | 文档 |
+| `README_BOARD_VERIFY.md` | 验证说明文档 | 文档 |
 
-**推荐使用**:
-```tcl
-# 在 Vivado Hardware Manager TCL Console 中:
-source script/verify/board_verify_complete.tcl  ;# 完整验证
-source script/verify/manual_test.tcl            ;# 手动测试
+### 2.2 BRAM硬件测试运行方法
+
+#### 方法1: Vivado TCL模式（推荐）
+
+```bash
+# 进入项目目录
+cd /root/project/FPGA/vitis/FPGA-Litho
+
+# 运行测试脚本
+vivado -mode tcl -source script/verify/bram_test.tcl
 ```
 
-### 2.2 其他调试工具脚本
+#### 方法2: Vivado Hardware Manager TCL Console
 
-| 文件 | 功能 | 平台 |
-|------|------|------|
-| `board_verify_xsct.tcl` | XSCT验证脚本 | XSCT |
-| `board_verify_xsdb.tcl` | XSDB调试脚本 | XSDB |
-| `board_verify.tcl` | XSCT基础脚本 | XSCT |
+```tcl
+# 在 Vivado Hardware Manager TCL Console 中:
+# 1. 打开 Vivado Hardware Manager
+# 2. 连接到硬件服务器 (localhost:3121)
+# 3. 打开硬件目标并下载bitstream
+# 4. 运行测试脚本:
 
-**使用示例**:
+source script/verify/bram_test.tcl
+```
+
+#### 方法3: 独立Tcl脚本执行
+
 ```bash
-xsct
-source script/verify/board_verify_xsct.tcl
+# 使用tclsh运行（需要在Vivado环境外）
+tclsh script/verify/bram_test.tcl
+```
+
+### 2.3 测试脚本功能
+
+`bram_test.tcl` 基于**官方文档**创建，包含以下测试：
+
+| 测试步骤 | 功能 | 验证内容 |
+|---------|------|---------|
+| 步骤1-7 | 硬件初始化 | JTAG连接、bitstream下载、AXI核心访问 |
+| 步骤8 | CONTROL寄存器 | IP状态验证 (ap_idle=1) |
+| 步骤9 | 重置操作 (OP_RESET=9) | BRAM存储重置，返回值验证 |
+| 步骤10-11 | 数据加载/读取 | 光源数据加载和验证 |
+| 步骤12 | 参数配置 | Lx/Ly/Nx/Ny参数写入和读回验证 |
+
+### 2.4 寄存器映射（官方定义）
+
+基于 `xhls_litho_system_bram_hw.h`:
+
+| 寄存器名称 | 地址 | 大小 | 功能 |
+|-----------|------|------|------|
+| AP_CTRL | 0x00 | 32-bit | 控制状态寄存器 (ap_start/done/idle/ready) |
+| GIE | 0x04 | 32-bit | 全局中断使能 |
+| IER | 0x08 | 32-bit | IP中断使能 |
+| ISR | 0x0c | 32-bit | IP中断状态 |
+| AP_RETURN | 0x10-0x14 | 64-bit | 返回值 (复数) |
+| OPERATION | 0x1c | 32-bit | 操作码选择 (0-9) |
+| IDX | 0x24 | 32-bit | 数组索引 |
+| VAL_R | 0x2c-0x30 | 64-bit | 数据值 (复数) |
+| MODE | 0x38 | 32-bit | 计算模式 (1=TCC, 2=SOCS) |
+| LX | 0x40 | 32-bit | 频域X尺寸 |
+| LY | 0x48 | 32-bit | 频域Y尺寸 |
+| NX | 0x50 | 32-bit | TCC/SOCS参数 |
+| NY | 0x58 | 32-bit | TCC/SOCS参数 |
+| SRCSIZE | 0x60 | 32-bit | 光源尺寸 |
+| NKERNELS | 0x68 | 32-bit | SOCS核数量 |
+
+### 2.5 操作码定义
+
+基于 `hls_litho_system_bram.h`:
+
+```tcl
+OP_LOAD_SOURCE   = 0  # 加载光源数据
+OP_LOAD_MASK     = 1  # 加载mask数据
+OP_LOAD_TCC      = 2  # 加载TCC矩阵
+OP_LOAD_KERNELS  = 3  # 加载SOCS kernels
+OP_LOAD_SCALES   = 4  # 加载SOCS scales
+OP_COMPUTE_TCC   = 5  # TCC模式计算
+OP_COMPUTE_SOCS  = 6  # SOCS模式计算
+OP_READ_IMGF     = 7  # 读取imgf结果
+OP_READ_IMG_OUT  = 8  # 读取img_out结果
+OP_RESET         = 9  # 重置所有BRAM存储
 ```
 
 ---
@@ -167,14 +225,17 @@ vivado_hls -f script/hls/run_cosim_bram.tcl
 vivado_hls -f script/hls/run_package_bram.tcl
 ```
 
-### 6.2 板级验证流程
-```tcl
-# Vivado Hardware Manager TCL Console:
-# Step 1: 连接硬件并创建AXI接口
-# (在Vivado GUI中完成)
+### 6.2 板级验证流程 ⭐
 
-# Step 2: 运行验证脚本
-source script/verify/board_verify_complete.tcl
+```bash
+# 方法1: Vivado TCL模式（推荐）
+cd /root/project/FPGA/vitis/FPGA-Litho
+vivado -mode tcl -source script/verify/bram_test.tcl
+
+# 方法2: Vivado Hardware Manager TCL Console
+# 在 Vivado GUI 中：
+#   Window -> Hardware Manager -> Tcl Console
+source script/verify/bram_test.tcl
 ```
 
 ### 6.3 Vitis构建流程
@@ -203,18 +264,12 @@ run_package_bram.tcl
 run_package_system.tcl
 ```
 
-### verify/ (10文件)
+### verify/ (4文件) ⭐
 ```
-board_verify_complete.tcl
-board_verify_hardware_manager.tcl
-board_verify_quick.tcl
-board_verify.tcl
-board_verify_vivado.tcl
-board_verify_xsct.tcl
-board_verify_xsdb.tcl
-bram_full_test.tcl
-manual_test.tcl
-test_commands.tcl
+bram_test.tcl              # ✅ 正确的测试脚本
+generate_test_data.py      # 数据生成工具
+QUICK_REFERENCE.md         # 快速参考
+README_BOARD_VERIFY.md     # 验证说明
 ```
 
 ### build/ (3文件)
@@ -239,4 +294,18 @@ v++_config.ini
 
 ---
 
-*重组日期: 2026-04-04*
+## 八、测试结果参考
+
+详细的测试结果请参考：
+- `doc/BRAM_TEST_SUMMARY.md` - 完整测试报告
+
+测试成功标志：
+- ✓ CONTROL寄存器: `0x00000004` (ap_idle=1)
+- ✓ 重置操作返回值: `0x3f800000` (IEEE754浮点数 1.0)
+- ✓ AXI核心: `hw_axi_1` 可访问
+- ✓ 参数验证: 4/4 通过
+
+---
+
+*文档更新日期: 2026-04-05*
+*测试验证日期: 2026-04-05*
