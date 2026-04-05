@@ -21,6 +21,40 @@
 #include <hls_math.h>
 
 //=============================================================================
+// Helper Functions
+//=============================================================================
+
+/**
+ * @brief 循环移位函数 - 将频域中心移到图像中心
+ * @param in 输入数组
+ * @param out 输出数组
+ * @param sizeX X方向尺寸
+ * @param sizeY Y方向尺寸
+ * @param shiftTypeX X方向移位类型（true=sizeX/2, false=(sizeX+1)/2）
+ * @param shiftTypeY Y方向移位类型
+ */
+void hls_shift_array_real_bram(
+    float in[],
+    float out[],
+    int sizeX,
+    int sizeY,
+    bool shiftTypeX,
+    bool shiftTypeY
+) {
+    int xh = shiftTypeX ? (sizeX / 2) : ((sizeX + 1) / 2);
+    int yh = shiftTypeY ? (sizeY / 2) : ((sizeY + 1) / 2);
+    
+    for (int y = 0; y < sizeY; y++) {
+        for (int x = 0; x < sizeX; x++) {
+#pragma HLS PIPELINE II=1
+            int sy = (y + yh) % sizeY;
+            int sx = (x + xh) % sizeX;
+            out[sy * sizeX + sx] = in[y * sizeX + x];
+        }
+    }
+}
+
+//=============================================================================
 // Top-Level Single-Function Implementation
 //=============================================================================
 
@@ -174,70 +208,100 @@ COPY_IMGF_TCC_LOOP:
                 break;
             }
             
-            // SOCS mode simplified compute
+            // SOCS mode full algorithm (移植自hls_socs.cpp)
+            // 计算尺寸参数
+            int sizeX = 4 * Nx + 1;
+            int sizeY = 4 * Ny + 1;
+            int difX = sizeX - (2 * Nx + 1);
+            int difY = sizeY - (2 * Ny + 1);
+            int kernelSize = (2 * Nx + 1) * (2 * Ny + 1);
+            int Lxh = Lx / 2;
+            int Lyh = Ly / 2;
+            
+            // 本地工作数组
             cmpxFloat mask_local[BRAM_MASK_SIZE];
-            cmpxFloat product_acc[BRAM_IMGF_SIZE];
-            float img_acc[BRAM_IMG_OUT_SIZE];
+            cmpxFloat product[(4 * BRAM_MAX_NX_SOCS + 1) * (4 * BRAM_MAX_NY + 1)];
+            float img_accum[(4 * BRAM_MAX_NX_SOCS + 1) * (4 * BRAM_MAX_NY + 1)];
+            float img_shifted[(4 * BRAM_MAX_NX_SOCS + 1) * (4 * BRAM_MAX_NY + 1)];
             
 #pragma HLS BIND_STORAGE variable=mask_local type=RAM_2P impl=BRAM
-#pragma HLS BIND_STORAGE variable=product_acc type=RAM_2P impl=BRAM
-#pragma HLS BIND_STORAGE variable=img_acc type=RAM_2P impl=BRAM
+#pragma HLS BIND_STORAGE variable=product type=RAM_2P impl=BRAM
+#pragma HLS BIND_STORAGE variable=img_accum type=RAM_2P impl=BRAM
+#pragma HLS BIND_STORAGE variable=img_shifted type=RAM_2P impl=BRAM
             
-            // Initialize accumulators
-INIT_SOCS_ACC_LOOP:
-            for (int i = 0; i < BRAM_IMGF_SIZE; i++) {
-#pragma HLS PIPELINE II=1
-                product_acc[i] = cmpxFloat(0.0f, 0.0f);
-            }
+#pragma HLS ARRAY_PARTITION variable=mask_local cyclic factor=4
+#pragma HLS ARRAY_PARTITION variable=product cyclic factor=4
+#pragma HLS ARRAY_PARTITION variable=img_accum cyclic factor=4
             
-INIT_IMG_SOCS_LOOP:
-            for (int i = 0; i < BRAM_IMG_OUT_SIZE; i++) {
-#pragma HLS PIPELINE II=1
-                img_acc[i] = 0.0f;
-            }
-            
-            // Copy mask to local
+            // 步骤1: 复制mask到本地缓存
 COPY_MASK_SOCS_LOOP:
             for (int i = 0; i < Lx * Ly; i++) {
 #pragma HLS PIPELINE II=1
                 mask_local[i] = mask_bram[i];
             }
             
-            // Kernel accumulation (simplified)
-KERNEL_SOCS_ACC_LOOP:
-            for (int k = 0; k < nkernels; k++) {
-                int kernel_start = k * 225;
-                
-KERNEL_MASK_SOCS_LOOP:
-                for (int i = 0; i < Lx * Ly; i++) {
+            // 步骤2: 初始化product和累加器
+INIT_PRODUCT_SOCS_LOOP:
+            for (int i = 0; i < sizeX * sizeY; i++) {
 #pragma HLS PIPELINE II=1
-                    int kernel_idx = i % 225;
-                    cmpxFloat kernel_val = kernels_bram[kernel_start + kernel_idx];
+                product[i] = cmpxFloat(0.0f, 0.0f);
+                img_accum[i] = 0.0f;
+            }
+            
+            // 步骤3: 多核循环计算
+            for (int k = 0; k < nkernels; k++) {
+                // Kernel-Mask复数乘法并填充到product数组
+                for (int y = -Ny; y <= Ny; y++) {
+                    for (int x = -Nx; x <= Nx; x++) {
+#pragma HLS PIPELINE II=1
+                        
+                        // Kernel索引 (正确映射)
+                        int krn_idx = (y + Ny) * (2 * Nx + 1) + (x + Nx);
+                        
+                        // Mask索引 (取中央区域)
+                        int msk_idx = (y + Lyh) * Lx + (x + Lxh);
+                        
+                        // Product位置 (填充到扩展区域)
+                        int prod_idx = (difY + y + Ny) * sizeX + difX + x + Nx;
+                        
+                        // 复数乘法: kernel[k][krn_idx] * mask[msk_idx] (DSP映射)
+                        cmpxFloat krn = kernels_bram[k * kernelSize + krn_idx];
+                        cmpxFloat msk = mask_local[msk_idx];
+                        
+                        float real_prod = krn.real() * msk.real() - krn.imag() * msk.imag();
+                        float imag_prod = krn.real() * msk.imag() + krn.imag() * msk.real();
+                        
+                        product[prod_idx] = cmpxFloat(real_prod, imag_prod);
+                    }
+                }
+                
+                // 平方幅度累加
+                float scale = scales_bram[k];
+                
+ACCUM_MAG_SOCS_LOOP:
+                for (int i = 0; i < sizeX * sizeY; i++) {
+#pragma HLS PIPELINE II=1
+                    float real_val = product[i].real();
+                    float imag_val = product[i].imag();
+                    float mag_sq = real_val * real_val + imag_val * imag_val;
                     
-                    float real_prod = mask_local[i].real() * kernel_val.real() 
-                                    - mask_local[i].imag() * kernel_val.imag();
-                    float imag_prod = mask_local[i].real() * kernel_val.imag() 
-                                    + mask_local[i].imag() * kernel_val.real();
-                    
-                    float scale = scales_bram[k];
-                    product_acc[i] += cmpxFloat(real_prod * scale, imag_prod * scale);
+                    img_accum[i] += scale * mag_sq;
                 }
             }
             
-            // Square magnitude calculation
-SQUARE_MAG_SOCS_LOOP:
-            for (int i = 0; i < Lx * Ly; i++) {
-#pragma HLS PIPELINE II=1
-                float mag_sq = product_acc[i].real() * product_acc[i].real()
-                             + product_acc[i].imag() * product_acc[i].imag();
-                img_acc[i] = mag_sq;
-            }
+            // 步骤4: 循环移位 (将频域中心移到图像中心)
+            hls_shift_array_real_bram(img_accum, img_shifted, sizeX, sizeY, true, true);
             
-            // Copy result to img_out_bram
+            // 步骤5: 输出截取中央区域
 COPY_IMG_OUT_SOCS_LOOP:
             for (int i = 0; i < Lx * Ly; i++) {
 #pragma HLS PIPELINE II=1
-                img_out_bram[i] = img_acc[i];
+                // 如果输出尺寸大于计算尺寸，填充零
+                if (i < sizeX * sizeY) {
+                    img_out_bram[i] = img_shifted[i];
+                } else {
+                    img_out_bram[i] = 0.0f;
+                }
             }
             
             result = cmpxFloat(1.0f, 0.0f);  // Success indicator
